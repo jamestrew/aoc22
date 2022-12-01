@@ -27,3 +27,7 @@ const input = `1000
 func TestPart1Example(t *testing.T) {
 	assert.Equal(t, 24000, part1(bufio.NewScanner(strings.NewReader(input))))
 }
+
+func TestPart2Example(t *testing.T) {
+	assert.Equal(t, 45000, part2(bufio.NewScanner(strings.NewReader(input))))
+}
