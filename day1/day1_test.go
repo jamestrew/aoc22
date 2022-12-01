@@ -1,10 +1,9 @@
 package day1
 
 import (
-	"bufio"
-	"strings"
 	"testing"
 
+	"github.com/jamestrew/aoc22/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,9 +24,9 @@ const input = `1000
 `
 
 func TestPart1Example(t *testing.T) {
-	assert.Equal(t, 24000, part1(bufio.NewScanner(strings.NewReader(input))))
+	assert.Equal(t, 24000, part1(utils.StringScanner(input)))
 }
 
 func TestPart2Example(t *testing.T) {
-	assert.Equal(t, 45000, part2(bufio.NewScanner(strings.NewReader(input))))
+	assert.Equal(t, 45000, part2(utils.StringScanner(input)))
 }

@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/jamestrew/aoc22/util"
+	"github.com/jamestrew/aoc22/utils"
 )
 
 func part1(scanner *bufio.Scanner) int {
@@ -49,6 +49,6 @@ func calorieSums(scanner *bufio.Scanner) []int {
 }
 
 func Answers() {
-	fmt.Println(part1(util.FileScanner("./day1/input1")))
-	fmt.Println(part2(util.FileScanner("./day1/input1")))
+	fmt.Println(part1(utils.GetInputScanner(1)))
+	fmt.Println(part2(utils.GetInputScanner(1)))
 }
