@@ -43,25 +43,14 @@ func getStack(stacksStr string) Stack {
 	ret := make(Stack)
 	for i := height - 1; i >= 0; i-- {
 		stack := stacks[i]
-		for i := 0; i < len(stack); i++ {
+		for i := 1; i < len(stack); i += 4 {
 			ch := stack[i]
 			if ch == ' ' {
 				continue
 			}
-
-			if ch == '[' {
-				col := (i + 5) / 4
-				ret[col] = append(ret[col], string(stack[i+1]))
-			}
+			col := (i + 5) / 4
+			ret[col] = append(ret[col], string(ch))
 		}
-	}
-	return ret
-}
-
-func numCols(stack Stack) int {
-	ret := 0
-	for range stack {
-		ret++
 	}
 	return ret
 }
@@ -90,9 +79,8 @@ func movesAndStacks(input string) (Moves, Stack) {
 }
 
 func getStackTops(stack Stack) string {
-	var ret []string
-	cols := numCols(stack)
-	for i := 1; i <= cols; i++ {
+	ret := make([]string, 0, len(stack))
+	for i := 1; i <= len(stack); i++ {
 		s := stack[i]
 		ret = append(ret, s[len(s)-1])
 	}
