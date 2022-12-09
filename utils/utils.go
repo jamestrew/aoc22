@@ -23,7 +23,8 @@ func StringScanner(input string) *bufio.Scanner {
 }
 
 func FetchInput(day int) string {
-	data, err := os.ReadFile("./.env")
+	cwd, _ := os.Getwd()
+	data, err := os.ReadFile(path.Join(cwd, ".env"))
 	check(err)
 
 	client := &http.Client{}
@@ -39,7 +40,7 @@ func FetchInput(day int) string {
 	cacheInput(day, body)
 	check(err)
 
-	return string(body)
+	return strings.TrimSpace(string(body))
 }
 
 func GetInput(day int) string {
@@ -69,7 +70,7 @@ func existsInCache(day int) bool {
 func getCachedInput(day int) string {
 	data, err := os.ReadFile(cachePath(day))
 	check(err)
-	return string(data)
+	return strings.TrimSpace(string(data))
 }
 
 func cachePath(day int) string {
