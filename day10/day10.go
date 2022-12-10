@@ -9,8 +9,10 @@ import (
 )
 
 type instruction struct {
-	cmd string
-	arg int
+	cmd       string
+	arg       int
+	cycleIncr int
+	regIncr   int
 }
 
 func programLines(input string) <-chan instruction {
@@ -19,29 +21,16 @@ func programLines(input string) <-chan instruction {
 		for _, line := range strings.Split(input, "\n") {
 			split := strings.Split(line, " ")
 			if len(split) == 1 {
-				ch <- instruction{cmd: split[0]}
+				ch <- instruction{cmd: split[0], cycleIncr: 1, regIncr: 0}
 			} else {
 				cmd, arg := split[0], split[1]
 				argInt, _ := strconv.Atoi(arg)
-				ch <- instruction{cmd, argInt}
+				ch <- instruction{cmd: cmd, arg: argInt, cycleIncr: 2, regIncr: argInt}
 			}
 		}
 		close(ch)
 	}()
 	return ch
-}
-
-func foo(inst instruction) (int, int) {
-	var cycleIncr, regIncr int
-	switch inst.cmd {
-	case "noop":
-		cycleIncr = 1
-		regIncr = 0
-	case "addx":
-		cycleIncr = 2
-		regIncr = inst.arg
-	}
-	return cycleIncr, regIncr
 }
 
 func part1(input string) int {
@@ -50,49 +39,34 @@ func part1(input string) int {
 	readCycle := 20
 	currCycle := 1
 	for instruction := range programLines(input) {
-		var cycleIncr, regIncr int
-		switch instruction.cmd {
-		case "noop":
-			cycleIncr = 1
-			regIncr = 0
-		case "addx":
-			cycleIncr = 2
-			regIncr = instruction.arg
-		}
-		for i := 0; i < cycleIncr; i++ {
+		for i := 0; i < instruction.cycleIncr; i++ {
 			if currCycle == readCycle {
 				ret += readCycle * reg
 				readCycle += 40
 			}
 			currCycle++
 		}
-		reg += regIncr
+		reg += instruction.regIncr
 	}
-
 	return ret
 }
 
 func part2(input string) []string {
-	// pixel location is reg - 1
-	// broken down into rows of 40
-	// 0-39
-	// 40-79
-	// 80-119
-	// 120...
+	const WIDTH = 40
+
 	reg := 1
 	currCycle := 1
 	lines := [][]string{}
 	for instruction := range programLines(input) {
-		cycleIncr, regIncr := foo(instruction)
-		for i := 0; i < cycleIncr; i++ {
+		for i := 0; i < instruction.cycleIncr; i++ {
 			spriteLoc := reg - 1
 			pixelLoc := currCycle - 1
 
-			row := pixelLoc / 40
-			pixelLoc = pixelLoc % 40
+			row := pixelLoc / WIDTH
+			pixelLoc = pixelLoc % WIDTH
 			var line []string
 			if row >= len(lines) {
-				line = make([]string, 40, 40)
+				line = make([]string, WIDTH, WIDTH)
 				lines = append(lines, line)
 			} else {
 				line = lines[row]
@@ -105,10 +79,8 @@ func part2(input string) []string {
 			}
 			currCycle++
 		}
-		reg += regIncr
+		reg += instruction.regIncr
 	}
-
-	// fmt.Println(lines)
 
 	var ret []string
 	for _, v := range lines {

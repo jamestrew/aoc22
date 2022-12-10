@@ -49,39 +49,55 @@ func getMotions(input string) []motion {
 func tailFollow(loc *locations) (int, int) {
 	dx := loc.head.x - loc.tail.x
 	dy := loc.head.y - loc.tail.y
-	if (dx <= 1 && dx >= -1) && (dy <= 1 && dy >= -1) {
+	if noMove(loc, dx, dy) {
 		return dx, dy
 	}
 
-	// TODO: could definitely use a clean up
-	if dx == 0 {
-		alignY(loc)
-		return dx, dy
-	} else if dy == 0 {
-		alignX(loc)
-		return dx, dy
+	if dx == 0 || dy == 0 {
+		rookMove(loc, dx, dy)
+	} else {
+		diagonalMove(loc, dx, dy)
 	}
-
-	alignX(loc)
-	alignY(loc)
 	return dx, dy
 }
 
-func alignX(loc *locations) {
+func locationDelta(loc *locations) (int, int) {
 	dx := loc.head.x - loc.tail.x
-	if dx >= 1 {
-		loc.tail.x++
-	} else if dx <= -1 {
-		loc.tail.x--
+	dy := loc.head.y - loc.tail.y
+	return dx, dy
+}
+
+func noMove(loc *locations, dx, dy int) bool {
+	if (dx <= 1 && dx >= -1) && (dy <= 1 && dy >= -1) {
+		return true
+	}
+	return false
+}
+
+func rookMove(loc *locations, dx, dy int) {
+	if dx == 0 {
+		alignDir(loc, dy, 'y')
+	} else {
+		alignDir(loc, dx, 'x')
 	}
 }
 
-func alignY(loc *locations) {
-	dy := loc.head.y - loc.tail.y
-	if dy >= 1 {
-		loc.tail.y++
-	} else if dy <= -1 {
-		loc.tail.y--
+func diagonalMove(loc *locations, dx, dy int) {
+	alignDir(loc, dx, 'x')
+	alignDir(loc, dy, 'y')
+}
+
+func alignDir(loc *locations, delta int, dir rune) {
+	if delta == 0 {
+		return
+	}
+	unitMagnitude := utils.Abs(delta) / delta
+
+	switch dir {
+	case 'x':
+		loc.tail.x += unitMagnitude
+	case 'y':
+		loc.tail.y += unitMagnitude
 	}
 }
 
