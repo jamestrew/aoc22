@@ -12,6 +12,9 @@ type TreeMap [][]int
 type Pos struct {
 	x, y int
 }
+type Tree struct {
+	x, y, height int
+}
 
 func makeTreeMap(input string) TreeMap {
 	rows := strings.Split(input, "\n")
@@ -35,12 +38,11 @@ func part1(input string) int {
 	trees := makeTreeMap(input)
 	for i, row := range trees[1 : len(trees)-1] {
 		for j, height := range row[1 : len(trees[0])-1] {
-			if isVisible(trees, height, Pos{i + 1, j + 1}) {
+			if isVisible(trees, Tree{i + 1, j + 1, height}) {
 				ret++
 			}
 		}
 	}
-
 	ret += countEdges(trees)
 	return ret
 }
@@ -50,42 +52,42 @@ func countEdges(trees TreeMap) int {
 	return 2*(rows+cols) - 4
 }
 
-func isVisible(trees TreeMap, height int, pos Pos) bool {
-	return checkLeft(trees, height, pos) || checkRight(trees, height, pos) ||
-		checkTop(trees, height, pos) ||
-		checkBottom(trees, height, pos)
+func isVisible(trees TreeMap, tree Tree) bool {
+	return checkLeft(trees, tree) || checkRight(trees, tree) ||
+		checkTop(trees, tree) ||
+		checkBottom(trees, tree)
 }
 
-func checkLeft(trees TreeMap, height int, pos Pos) bool {
-	for j := 0; j < pos.y; j++ {
-		if trees[pos.x][j] >= height {
+func checkLeft(trees TreeMap, tree Tree) bool {
+	for j := 0; j < tree.y; j++ {
+		if trees[tree.x][j] >= tree.height {
 			return false
 		}
 	}
 	return true
 }
 
-func checkRight(trees TreeMap, height int, pos Pos) bool {
-	for j := len(trees[0]) - 1; j > pos.y; j-- {
-		if trees[pos.x][j] >= height {
+func checkRight(trees TreeMap, tree Tree) bool {
+	for j := len(trees[0]) - 1; j > tree.y; j-- {
+		if trees[tree.x][j] >= tree.height {
 			return false
 		}
 	}
 	return true
 }
 
-func checkTop(trees TreeMap, height int, pos Pos) bool {
-	for i := 0; i < pos.x; i++ {
-		if trees[i][pos.y] >= height {
+func checkTop(trees TreeMap, tree Tree) bool {
+	for i := 0; i < tree.x; i++ {
+		if trees[i][tree.y] >= tree.height {
 			return false
 		}
 	}
 	return true
 }
 
-func checkBottom(trees TreeMap, height int, pos Pos) bool {
-	for i := len(trees) - 1; i > pos.x; i-- {
-		if trees[i][pos.y] >= height {
+func checkBottom(trees TreeMap, tree Tree) bool {
+	for i := len(trees) - 1; i > tree.x; i-- {
+		if trees[i][tree.y] >= tree.height {
 			return false
 		}
 	}
@@ -98,11 +100,11 @@ func part2(input string) int {
 	for i, rows := range trees {
 		score := 0
 		for j, height := range rows {
-			pos := Pos{i, j}
-			left := lookLeft(trees, height, pos)
-			right := lookRight(trees, height, pos)
-			up := lookUp(trees, height, pos)
-			down := lookDown(trees, height, pos)
+			tree := Tree{i, j, height}
+			left := countTreesLeft(trees, tree)
+			right := countTreesRight(trees, tree)
+			up := countTreesUp(trees, tree)
+			down := countTreesDown(trees, tree)
 			score = left * right * up * down
 			if score > ret {
 				ret = score
@@ -112,44 +114,44 @@ func part2(input string) int {
 	return ret
 }
 
-func lookLeft(trees TreeMap, height int, pos Pos) int {
+func countTreesLeft(trees TreeMap, tree Tree) int {
 	count := 0
-	for j := pos.y - 1; j >= 0; j-- {
+	for j := tree.y - 1; j >= 0; j-- {
 		count++
-		if trees[pos.x][j] >= height {
+		if trees[tree.x][j] >= tree.height {
 			break
 		}
 	}
 	return count
 }
 
-func lookRight(trees TreeMap, height int, pos Pos) int {
+func countTreesRight(trees TreeMap, tree Tree) int {
 	count := 0
-	for j := pos.y + 1; j <= len(trees[0])-1; j++ {
+	for j := tree.y + 1; j <= len(trees[0])-1; j++ {
 		count++
-		if trees[pos.x][j] >= height {
+		if trees[tree.x][j] >= tree.height {
 			break
 		}
 	}
 	return count
 }
 
-func lookUp(trees TreeMap, height int, pos Pos) int {
+func countTreesUp(trees TreeMap, tree Tree) int {
 	count := 0
-	for i := pos.x - 1; i >= 0; i-- {
+	for i := tree.x - 1; i >= 0; i-- {
 		count++
-		if trees[i][pos.y] >= height {
+		if trees[i][tree.y] >= tree.height {
 			break
 		}
 	}
 	return count
 }
 
-func lookDown(trees TreeMap, height int, pos Pos) int {
+func countTreesDown(trees TreeMap, tree Tree) int {
 	count := 0
-	for i := pos.x + 1; i <= len(trees)-1; i++ {
+	for i := tree.x + 1; i <= len(trees)-1; i++ {
 		count++
-		if trees[i][pos.y] >= height {
+		if trees[i][tree.y] >= tree.height {
 			break
 		}
 	}

@@ -37,7 +37,7 @@ func TestPart2LookLeft(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		assert.Equal(t, tc.expected, lookLeft(trees, tc.height, Pos{tc.i, tc.j}))
+		assert.Equal(t, tc.expected, countTreesLeft(trees, Tree{tc.i, tc.j, tc.height}))
 	}
 }
 
@@ -53,7 +53,7 @@ func TestPart2LookRight(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		assert.Equal(t, tc.expected, lookRight(trees, tc.height, Pos{tc.i, tc.j}))
+		assert.Equal(t, tc.expected, countTreesRight(trees, Tree{tc.i, tc.j, tc.height}))
 	}
 }
 
@@ -69,7 +69,7 @@ func TestPart2LookUp(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		assert.Equal(t, tc.expected, lookUp(trees, tc.height, Pos{tc.i, tc.j}))
+		assert.Equal(t, tc.expected, countTreesUp(trees, Tree{tc.i, tc.j, tc.height}))
 	}
 }
 
@@ -81,10 +81,10 @@ func TestPart2LookDown(t *testing.T) {
 		height, i, j, expected int
 	}{
 		{5, 3, 2, 1},
-		// {5, 1, 2, 2},
+		{5, 1, 2, 2},
 	}
 
 	for _, tc := range tests {
-		assert.Equal(t, tc.expected, lookDown(trees, tc.height, Pos{tc.i, tc.j}))
+		assert.Equal(t, tc.expected, countTreesDown(trees, Tree{tc.i, tc.j, tc.height}))
 	}
 }
