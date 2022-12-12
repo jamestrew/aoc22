@@ -32,9 +32,10 @@ func FetchInput(day int) string {
 	check(err)
 	req.AddCookie(&http.Cookie{Name: "session", Value: strings.Trim(string(data), "\n")})
 
-	fmt.Println("Fetching data")
+	fmt.Println("Fetching data...")
 	resp, err := client.Do(req)
 	check(err)
+	fmt.Println("Fetched")
 
 	body, err := io.ReadAll(resp.Body)
 	cacheInput(day, body)

@@ -97,6 +97,12 @@ func (q *Queue[T]) Dequeue() T {
 	return val
 }
 
+func (q *Queue[T]) Clear() {
+	for q.Size != 0 {
+		q.Dequeue()
+	}
+}
+
 func (q *Queue[T]) Peek() T {
 	return q.Head.Val
 }
