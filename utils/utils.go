@@ -61,6 +61,9 @@ type Float interface {
 }
 
 func Min[T Ordered](slice []T) T {
+	if len(slice) == 0 {
+		panic("can't find Min of a zero length slice")
+	}
 	min := slice[0]
 	for i := 1; i < len(slice); i++ {
 		if slice[i] < min {
@@ -71,6 +74,9 @@ func Min[T Ordered](slice []T) T {
 }
 
 func Max[T Ordered](slice []T) T {
+	if len(slice) == 0 {
+		panic("can't find Max of a zero length slice")
+	}
 	max := slice[0]
 	for i := 1; i < len(slice); i++ {
 		if slice[i] > max {
@@ -78,4 +84,31 @@ func Max[T Ordered](slice []T) T {
 		}
 	}
 	return max
+}
+
+type Pos struct {
+	X, Y int
+}
+
+var dirs = []Pos{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
+
+func GetNeighbors[T any](matrix [][]T, pos Pos) <-chan Pos {
+	ret := make(chan Pos)
+
+	go func() {
+		yMax, xMax := len(matrix), len(matrix[0])
+		if xMax == 0 || yMax == 0 {
+			close(ret)
+			return
+		}
+
+		for _, dir := range dirs {
+			newx, newy := pos.X+dir.X, pos.Y+dir.Y
+			if newx >= 0 && newx < xMax && newy >= 0 && newy < yMax {
+				ret <- Pos{newx, newy}
+			}
+		}
+		close(ret)
+	}()
+	return ret
 }

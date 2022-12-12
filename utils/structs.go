@@ -130,3 +130,28 @@ func (q *Queue[T]) DebugPrint() {
 	s := q.ToSlice()
 	fmt.Println(s)
 }
+
+type DefaultDict[K comparable, V any] struct {
+	_map       map[K]V
+	defaultVal V
+}
+
+func NewDefaultDict[K comparable, V any](defaultVal V) *DefaultDict[K, V] {
+	return &DefaultDict[K, V]{
+		_map:       make(map[K]V),
+		defaultVal: defaultVal,
+	}
+}
+
+func (d *DefaultDict[K, V]) Set(key K, val V) {
+	d._map[key] = val
+}
+
+func (d *DefaultDict[K, V]) Get(key K) V {
+	val, ok := d._map[key]
+	if !ok {
+		d._map[key] = d.defaultVal
+		return d.defaultVal
+	}
+	return val
+}
