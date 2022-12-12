@@ -1,6 +1,9 @@
 package utils
 
-import "strconv"
+import (
+	"strconv"
+	"strings"
+)
 
 func Map[T any, S any](fn func(T) S, slice []T) []S {
 	ret := make([]S, 0, len(slice))
@@ -13,8 +16,19 @@ func Map[T any, S any](fn func(T) S, slice []T) []S {
 
 func MapStrInt(slice []string) []int {
 	fn := func(x string) int {
+		x = strings.TrimSpace(x)
 		i, _ := strconv.Atoi(x)
 		return i
+	}
+
+	return Map(fn, slice)
+}
+
+func MapStrInt64(slice []string) []int64 {
+	fn := func(x string) int64 {
+		x = strings.TrimSpace(x)
+		i, _ := strconv.Atoi(x)
+		return int64(i)
 	}
 
 	return Map(fn, slice)

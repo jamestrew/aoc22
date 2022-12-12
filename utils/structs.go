@@ -1,5 +1,7 @@
 package utils
 
+import "fmt"
+
 type Set[T comparable] struct {
 	vals map[T]bool
 }
@@ -55,4 +57,70 @@ func (h *HashMap[K, V]) Del(key K) V {
 		delete(h._map, key)
 	}
 	return val
+}
+
+type Node[T any] struct {
+	Val  T
+	Next *Node[T]
+}
+
+type Queue[T any] struct {
+	Size int
+	Head *Node[T]
+	Tail *Node[T]
+}
+
+func NewQueue[T any](val T) *Queue[T] {
+	q := &Queue[T]{}
+	q.Enqueue(val)
+	return q
+}
+
+func (q *Queue[T]) Enqueue(val T) {
+	node := &Node[T]{Val: val}
+	if q.Head == nil {
+		q.Head = node
+		q.Tail = node
+		q.Size++
+		return
+	}
+
+	q.Tail.Next = node
+	q.Tail = node
+	q.Size++
+}
+
+func (q *Queue[T]) Dequeue() T {
+	val := q.Head.Val
+	q.Head = q.Head.Next
+	q.Size--
+	return val
+}
+
+func (q *Queue[T]) Peek() T {
+	return q.Head.Val
+}
+
+func QueueFromSlice[T any](slice []T) *Queue[T] {
+	q := &Queue[T]{Size: 0}
+	for _, val := range slice {
+		q.Enqueue(val)
+	}
+	return q
+}
+
+func (q *Queue[T]) ToSlice() []T {
+	ret := []T{}
+	head := q.Head
+
+	for head != nil {
+		ret = append(ret, head.Val)
+		head = head.Next
+	}
+	return ret
+}
+
+func (q *Queue[T]) DebugPrint() {
+	s := q.ToSlice()
+	fmt.Println(s)
 }
