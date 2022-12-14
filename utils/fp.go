@@ -15,13 +15,20 @@ func Map[T any, S any](fn func(T) S, slice []T) []S {
 }
 
 func MapStrInt(slice []string) []int {
-	fn := func(x string) int {
-		x = strings.TrimSpace(x)
-		i, _ := strconv.Atoi(x)
-		return i
+	// fmt.Println(len(slice))
+	if len(slice) == 0 {
+		return []int{}
 	}
 
-	return Map(fn, slice)
+	ret := make([]int, 0, len(slice))
+	for _, v := range slice {
+		v = strings.TrimSpace(v)
+		i, err := strconv.Atoi(v)
+		if err == nil {
+			ret = append(ret, i)
+		}
+	}
+	return ret
 }
 
 func MapStrInt64(slice []string) []int64 {

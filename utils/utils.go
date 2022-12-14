@@ -60,7 +60,7 @@ type Float interface {
 	~float32 | ~float64
 }
 
-func Min[T Ordered](slice []T) T {
+func Min[T Ordered](slice ...T) T {
 	if len(slice) == 0 {
 		panic("can't find Min of a zero length slice")
 	}
@@ -73,7 +73,7 @@ func Min[T Ordered](slice []T) T {
 	return min
 }
 
-func Max[T Ordered](slice []T) T {
+func Max[T Ordered](slice ...T) T {
 	if len(slice) == 0 {
 		panic("can't find Max of a zero length slice")
 	}

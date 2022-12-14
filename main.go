@@ -1,7 +1,7 @@
 package main
 
-import "github.com/jamestrew/aoc22/day12"
+import "github.com/jamestrew/aoc22/day13"
 
 func main() {
-	day12.Answers()
+	day13.Answers()
 }
