@@ -131,6 +131,41 @@ func (q *Queue[T]) DebugPrint() {
 	fmt.Println(s)
 }
 
+type Stack[T any] struct {
+	Size int
+	Top  *Node[T]
+}
+
+func (s *Stack[T]) Push(val T) {
+	node := &Node[T]{Val: val}
+	s.Size++
+	if s.Top == nil {
+		s.Top = node
+	} else {
+		node.Next = s.Top
+		s.Top = node
+	}
+}
+
+func (s *Stack[T]) Pop() T {
+	var ret T
+	if s.Size == 0 {
+		return ret
+	}
+	ret = s.Top.Val
+	s.Top = s.Top.Next
+
+	return ret
+}
+
+func (s *Stack[T]) Peek() T {
+	var ret T
+	if s.Size == 0 {
+		return ret
+	}
+	return s.Top.Val
+}
+
 type DefaultDict[K comparable, V any] struct {
 	_map       map[K]V
 	defaultVal V
