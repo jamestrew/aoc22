@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/jamestrew/aoc22/utils"
 )
 
 type Expr interface {
@@ -44,7 +46,8 @@ func parse(input string) *List {
 
 	root := &List{}
 	curr := root
-	parent := root
+	parent := utils.Stack[*List]{}
+	parent.Push(root)
 
 	var num strings.Builder
 	for _, ch := range input {
@@ -52,17 +55,14 @@ func parse(input string) *List {
 		case '[':
 			list := &List{}
 			curr.elements = append(curr.elements, list)
-			parent = curr
+			parent.Push(curr)
 			curr = list
 		case ']':
 			if val, ok := makeNum(num); ok {
 				curr.elements = append(curr.elements, &Int{val})
 				num.Reset()
 			}
-			curr = parent
-			if curr == parent {
-				parent = root
-			}
+			curr = parent.Pop()
 		case ',':
 			if val, ok := makeNum(num); ok {
 				curr.elements = append(curr.elements, &Int{val})
