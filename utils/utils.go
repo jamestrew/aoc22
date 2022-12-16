@@ -3,7 +3,16 @@ package utils
 import (
 	"errors"
 	"math"
+	"strconv"
 )
+
+func Atoi(x string) int {
+	i, err := strconv.Atoi(x)
+	if err != nil {
+		panic(err)
+	}
+	return i
+}
 
 func Abs(x int) int {
 	if x < 0 {
