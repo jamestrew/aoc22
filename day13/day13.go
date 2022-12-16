@@ -1,7 +1,6 @@
 package day13
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -17,98 +16,101 @@ import (
 // if both list -> compare ints -> small len, high len - compare values
 // if one int   -> convert int to list & retry comparison
 
-type Packet struct {
-	vals  []int
-	depth int
-}
+type comp int
+
+const (
+	ok comp = iota
+	pass
+	bad
+)
 
 type PacketPair struct {
-	left, right Packet
-}
-
-func (p *PacketPair) inOrder() bool {
-	if p.eitherEmpty() {
-		return p.emptyInOrder()
-	}
-
-	ret := true
-	length := utils.Min(len(p.left.vals), len(p.right.vals))
-	for i := 0; i < length; i++ {
-		if p.left.vals[i] > p.right.vals[i] {
-			ret = false
-			break
-		}
-		if p.left.vals[i] < p.right.vals[i] {
-			return true
-		}
-	}
-	if ret && len(p.left.vals) > len(p.right.vals) {
-		ret = false
-	}
-
-	return ret
-}
-
-func (p *PacketPair) eitherEmpty() bool {
-	return len(p.left.vals) == 0 || len(p.right.vals) == 0
-}
-
-func (p *PacketPair) emptyInOrder() bool {
-	if len(p.left.vals) != 0 && len(p.right.vals) != 0 {
-		return true
-	}
-	if len(p.left.vals) == 0 && len(p.right.vals) != 0 {
-		return true
-	}
-	if len(p.left.vals) != 0 && len(p.right.vals) == 0 {
-		return false
-	}
-	return p.left.depth < p.right.depth
+	left, right *List
 }
 
 func part1(input string) int {
 	ret := 0
-	// packets := parseJson(input)
-	// // fmt.Println(packets)
-	// for _, pair := range packets {
-	// 	checkOrder(pair.left, pair.right)
-	// }
+	packets := parseInput(input)
+	for idx, pair := range packets {
+		if c := compare(pair.left, pair.right); c == ok {
+			ret += idx + 1
+		}
+	}
 	return ret
 }
 
-func checkOrder(left, right []interface{}) {
-	// length := utils.Min(len(left), len(right))
+func compare(left, right *List) comp {
+	minLength := utils.Min(left.Length(), right.Length())
 
-	// for i := 0; i < length; i++ {
-	// 	b := left[i]
-	// 	switch b := b.(int) {
-	// 	case int:
-	// 		fmt.Println("int", b)
-	// 	case interface{}:
-	// 		fmt.Println("blah", b)
-	// 	}
-	// }
+	for i := 0; i < minLength; i++ {
+		l, r := left.elements[i], right.elements[i]
+		var c comp
+		if c = intOrdered(l, r); c != pass {
+			return c
+		}
+		if c = listOrdered(l, r); c != pass {
+			return c
+		}
+		if c = asymmetricOrdered(l, r); c != pass {
+			return c
+		}
+	}
+
+	if left.Length() < right.Length() {
+		return ok
+	} else if left.Length() > right.Length() {
+		return bad
+	}
+
+	return pass
 }
 
-func compareInts(left, right int) bool {
-	return false
+func intOrdered(left, right Expr) comp {
+	l, lOk := left.(*Int)
+	r, rOk := right.(*Int)
+
+	if (!lOk || !rOk) || l.val == r.val {
+		return pass
+	}
+
+	if l.val < r.val {
+		return ok
+	}
+	return bad
 }
 
-func compareLists(left, right int) bool {
-	return false
+func listOrdered(left, right Expr) comp {
+	l, lOk := left.(*List)
+	r, rOk := right.(*List)
+
+	if !lOk || !rOk {
+		return pass
+	}
+	return compare(l, r)
 }
 
-func asymmetricType(left, right interface{}) {
+func asymmetricOrdered(left, right Expr) comp {
+	lInt, lOk := left.(*Int)
+	rList, rOk := right.(*List)
+	if lOk && rOk {
+		lList := &List{}
+		lList.elements = append(lList.elements, lInt)
+		return compare(lList, rList)
+	}
 
+	lList, lOk := left.(*List)
+	rInt, rOk := right.(*Int)
+	if lOk && rOk {
+		rList := &List{}
+		rList.elements = append(rList.elements, rInt)
+		return compare(lList, rList)
+	}
+	return pass
 }
 
 func part2(input string) int {
 	ret := 0
 	return ret
-}
-
-type foo struct {
-	f json.RawMessage
 }
 
 func parseInput(input string) []PacketPair {
@@ -118,24 +120,12 @@ func parseInput(input string) []PacketPair {
 	for _, pair := range strings.Split(input, "\n\n") {
 		packets := strings.Split(pair, "\n")
 		p := PacketPair{
-			left:  flattenPacketArray(packets[0]),
-			right: flattenPacketArray(packets[1]),
+			left:  parseList(packets[0]),
+			right: parseList(packets[1]),
 		}
 		ret = append(ret, p)
 	}
 	return ret
-}
-
-func flattenPacketArray(packet string) Packet {
-	depth := getDepth(packet)
-	packet = strings.ReplaceAll(packet, "[", "")
-	packet = strings.ReplaceAll(packet, "]", "")
-	data := strings.Split(packet, ",")
-	return Packet{utils.MapStrInt(data), depth}
-}
-
-func getDepth(packet string) int {
-	return strings.Count(packet, "[")
 }
 
 func Answers() {

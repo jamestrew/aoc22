@@ -9,6 +9,7 @@ import (
 )
 
 type Expr interface {
+	Expression()
 	String() string
 }
 
@@ -16,9 +17,14 @@ type List struct {
 	elements []Expr
 }
 
+func (l *List) Expression() {}
 func (l *List) Length() int {
+	if l.elements == nil {
+		return 0
+	}
 	return len(l.elements)
 }
+
 func (l *List) String() string {
 	var out strings.Builder
 	out.WriteString("[")
@@ -36,11 +42,10 @@ type Int struct {
 	val int
 }
 
-func (i *Int) String() string {
-	return fmt.Sprintf("%d", i.val)
-}
+func (i *Int) Expression()    {}
+func (i *Int) String() string { return fmt.Sprintf("%d", i.val) }
 
-func parse(input string) *List {
+func parseList(input string) *List {
 	input = strings.TrimSpace(input)
 	input = input[1:]
 

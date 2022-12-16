@@ -32,9 +32,30 @@ const input = `
 [1,[2,[3,[4,[5,6,0]]]],8,9]
 `
 
-// func TestPart1Example(t *testing.T) {
-// 	assert.Equal(t, 13, part1(input))
-// }
+func TestPart1Example(t *testing.T) {
+	assert.Equal(t, 13, part1(input))
+}
+
+func TestIsOrdered(t *testing.T) {
+	tests := []struct {
+		input string
+		c     comp
+	}{
+		{"[1,1,3,1,1]\n[1,1,5,1,1]", ok},
+		{"[1,1,3,2,1]\n[1,1,5,1,1]", ok},
+		{"[[1]]\n[[2]]", ok},
+		{"[]\n[3]", ok},
+		{"[1]\n[2]", ok},
+		{"[9]\n[[8,7,6]]", bad},
+		{"[[9]]\n[[8,7,6]]", bad},
+		{"[6,1,3,9,6]\n[6,1,3,9]", bad},
+	}
+
+	for _, tc := range tests {
+		pair := parseInput(tc.input)[0]
+		assert.Equal(t, tc.c, compare(pair.left, pair.right), tc.input)
+	}
+}
 
 func TestPart2Example(t *testing.T) {
 	assert.Equal(t, 0, part2(input))
@@ -63,7 +84,7 @@ func TestParser(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		assert.Equal(t, tc.expected, parse(tc.input))
+		assert.Equal(t, tc.expected, parseList(tc.input))
 	}
 }
 
@@ -85,7 +106,7 @@ func TestExprString(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		expr := parse(tc)
+		expr := parseList(tc)
 		assert.Equal(t, tc, expr.String())
 	}
 }
