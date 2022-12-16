@@ -36,6 +36,10 @@ func TestPart1Example(t *testing.T) {
 	assert.Equal(t, 13, part1(input))
 }
 
+func TestPart2Example(t *testing.T) {
+	assert.Equal(t, 140, part2(input))
+}
+
 func TestIsOrdered(t *testing.T) {
 	tests := []struct {
 		input string
@@ -49,16 +53,13 @@ func TestIsOrdered(t *testing.T) {
 		{"[9]\n[[8,7,6]]", bad},
 		{"[[9]]\n[[8,7,6]]", bad},
 		{"[6,1,3,9,6]\n[6,1,3,9]", bad},
+		{"[[1],[2,3,4]]\n[[1],4]", ok},
 	}
 
 	for _, tc := range tests {
 		pair := parseInput1(tc.input)[0]
-		assert.Equal(t, tc.c, compare(pair.left, pair.right), tc.input)
+		assert.Equal(t, tc.c, pair.left.Compare(pair.right), tc.input)
 	}
-}
-
-func TestPart2Example(t *testing.T) {
-	assert.Equal(t, 140, part2(input))
 }
 
 func TestParser(t *testing.T) {

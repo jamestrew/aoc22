@@ -11,6 +11,7 @@ import (
 type Expr interface {
 	Expression()
 	String() string
+	Compare(Expr) comp
 }
 
 type List struct {
@@ -38,12 +39,60 @@ func (l *List) String() string {
 	return out.String()
 }
 
+func (l *List) Compare(right Expr) comp {
+	switch r := right.(type) {
+	case *List:
+		minLength := utils.Min(l.Length(), r.Length())
+
+		for i := 0; i < minLength; i++ {
+			left, right := l.elements[i], r.elements[i]
+			if c := left.Compare(right); c != pass {
+				return c
+			}
+		}
+
+		delta := l.Length() - r.Length()
+		switch {
+		case delta < 0:
+			return ok
+		case delta > 0:
+			return bad
+		default:
+			return pass
+		}
+
+	case *Int:
+		right := &List{}
+		right.elements = append(right.elements, r)
+		return l.Compare(right)
+	}
+	panic(fmt.Sprintf("list compare shouldn't be here: %v-%v", l, right))
+}
+
 type Int struct {
 	val int
 }
 
 func (i *Int) Expression()    {}
 func (i *Int) String() string { return fmt.Sprintf("%d", i.val) }
+func (i *Int) Compare(right Expr) comp {
+	switch r := right.(type) {
+	case *Int:
+		switch {
+		case i.val > r.val:
+			return bad
+		case i.val < r.val:
+			return ok
+		default:
+			return pass
+		}
+	case *List:
+		left := &List{}
+		left.elements = append(left.elements, i)
+		return left.Compare(r)
+	}
+	panic(fmt.Sprintf("int compare shouldn't be here: %v-%v", i, right))
+}
 
 func parseList(input string) *List {
 	input = strings.TrimSpace(input)
