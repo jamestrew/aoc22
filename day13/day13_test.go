@@ -52,13 +52,13 @@ func TestIsOrdered(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		pair := parseInput(tc.input)[0]
+		pair := parseInput1(tc.input)[0]
 		assert.Equal(t, tc.c, compare(pair.left, pair.right), tc.input)
 	}
 }
 
 func TestPart2Example(t *testing.T) {
-	assert.Equal(t, 0, part2(input))
+	assert.Equal(t, 140, part2(input))
 }
 
 func TestParser(t *testing.T) {

@@ -112,3 +112,13 @@ func GetNeighbors[T any](matrix [][]T, pos Pos) <-chan Pos {
 	}()
 	return ret
 }
+
+func Sort[T any](slice []T, fn func(T, T) bool) {
+	for i := 0; i < len(slice)-1; i++ {
+		for j := 0; j < len(slice)-i-1; j++ {
+			if fn(slice[j], slice[j+1]) {
+				slice[j], slice[j+1] = slice[j+1], slice[j]
+			}
+		}
+	}
+}
