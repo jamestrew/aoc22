@@ -1,7 +1,20 @@
-use aoc22::day_inputs;
+use std::{
+    collections::HashSet,
+    fmt::{Debug, Write},
+};
 
-#[derive(Debug, PartialEq, Eq)]
+use aoc22::day_inputs;
+use itertools::Itertools;
+
+#[repr(transparent)]
+#[derive(PartialEq, Clone, Eq, Hash)]
 struct Item(u8);
+
+impl Debug for Item {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_char(self.0 as char)
+    }
+}
 
 impl Item {
     pub fn priority(&self) -> usize {
@@ -23,7 +36,7 @@ impl From<u8> for Item {
     }
 }
 
-pub(crate) struct Rucksack(Vec<Item>);
+struct Rucksack(Vec<Item>);
 
 impl Rucksack {
     fn common_item(&self) -> &Item {
@@ -44,18 +57,29 @@ impl From<&str> for Rucksack {
 fn main() {
     let input = day_inputs(3);
     println!("{}", part1(&input));
+    println!("{}", part2(&input));
 }
 
 fn part1(input: &str) -> usize {
     input
         .lines()
-        .map(|rs| Rucksack::from(rs))
+        .map(Rucksack::from)
         .map(|rs| rs.common_item().priority())
         .sum()
 }
 
 fn part2(input: &str) -> usize {
-    todo!()
+    input
+        .lines()
+        .map(|line| line.bytes().map(Item::from).collect::<HashSet<_>>())
+        .tuples()
+        .map(|(a, b, c)| {
+            a.iter()
+                .find(|i| b.contains(i) && c.contains(i))
+                .map(|i| i.priority())
+                .unwrap_or_default()
+        })
+        .sum()
 }
 
 #[cfg(test)]
