@@ -12,7 +12,7 @@ fn part1(input: &str) -> String {
     let mut stacks = CargoStacks::from(stacks);
     let instructions = Instructions::from(instructions);
 
-    stacks.apply_move_instructions(&instructions);
+    CrateMove9000::move_crates(&mut stacks, &instructions);
     stacks.tops()
 }
 

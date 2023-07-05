@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use std::ops::Deref;
+use std::ops::{Deref, DerefMut};
 
 pub fn split_input(input: &str) -> (&str, &str) {
     let mut split = input.split("\n\n");
@@ -19,15 +19,6 @@ impl CargoStacks {
             .and_then(|num_str| num_str.parse::<usize>().ok())
     }
 
-    pub fn apply_move_instructions(&mut self, instructions: &Instructions) {
-        for instr in instructions.iter() {
-            for _ in 0..instr.count {
-                let cargo = self.0[instr.from - 1].pop().unwrap();
-                self.0[instr.to - 1].push(cargo);
-            }
-        }
-    }
-
     pub fn tops(&self) -> String {
         let mut ret = String::with_capacity(self.0.len());
         for stack in self.0.iter() {
@@ -44,6 +35,12 @@ impl Deref for CargoStacks {
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl DerefMut for CargoStacks {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
     }
 }
 
@@ -101,6 +98,23 @@ impl Deref for Instructions {
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+pub trait CrateMover {
+    fn move_crates(cargo: &mut CargoStacks, instructions: &Instructions);
+}
+
+pub struct CrateMove9000;
+
+impl CrateMover for CrateMove9000 {
+    fn move_crates(cargo: &mut CargoStacks, instructions: &Instructions) {
+        for instr in instructions.iter() {
+            for _ in 0..instr.count {
+                let crate_ = cargo[instr.from - 1].pop().unwrap();
+                cargo[instr.to - 1].push(crate_);
+            }
+        }
     }
 }
 
@@ -189,7 +203,7 @@ move 1 from 1 to 2";
             to: 1,
         }]);
 
-        stacks.apply_move_instructions(&instructions);
+        CrateMove9000::move_crates(&mut stacks, &instructions);
 
         assert_eq!(
             *stacks,
@@ -201,7 +215,7 @@ move 1 from 1 to 2";
     fn whole_sample() {
         let mut stacks = CargoStacks::from(CARGO);
         let instructions = Instructions::from(INSTRUCTIONS);
-        stacks.apply_move_instructions(&instructions);
+        CrateMove9000::move_crates(&mut stacks, &instructions);
 
         assert_eq!(
             *stacks,
