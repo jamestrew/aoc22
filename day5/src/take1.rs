@@ -105,15 +105,29 @@ pub trait CrateMover {
     fn move_crates(cargo: &mut CargoStacks, instructions: &Instructions);
 }
 
-pub struct CrateMove9000;
+pub struct CrateMover9000;
 
-impl CrateMover for CrateMove9000 {
+impl CrateMover for CrateMover9000 {
     fn move_crates(cargo: &mut CargoStacks, instructions: &Instructions) {
         for instr in instructions.iter() {
             for _ in 0..instr.count {
                 let crate_ = cargo[instr.from - 1].pop().unwrap();
                 cargo[instr.to - 1].push(crate_);
             }
+        }
+    }
+}
+
+pub struct CrateMover9001;
+
+impl CrateMover for CrateMover9001 {
+    fn move_crates(cargo: &mut CargoStacks, instructions: &Instructions) {
+        for instr in instructions.iter() {
+            let from = &mut cargo[instr.from - 1];
+            let popped = from
+                .drain(from.len() - instr.count..from.len())
+                .collect::<Vec<_>>();
+            cargo[instr.to - 1].extend(popped);
         }
     }
 }
@@ -195,7 +209,7 @@ move 1 from 1 to 2";
     }
 
     #[test]
-    fn first_instruction() {
+    fn cratemover9000_first_instruction() {
         let mut stacks = CargoStacks(vec![vec!['Z', 'N'], vec!['M', 'C', 'D'], vec!['P']]);
         let instructions = Instructions(vec![Instruction {
             count: 1,
@@ -203,7 +217,7 @@ move 1 from 1 to 2";
             to: 1,
         }]);
 
-        CrateMove9000::move_crates(&mut stacks, &instructions);
+        CrateMover9000::move_crates(&mut stacks, &instructions);
 
         assert_eq!(
             *stacks,
@@ -212,14 +226,67 @@ move 1 from 1 to 2";
     }
 
     #[test]
-    fn whole_sample() {
+    fn cratemover9000_whole_sample() {
         let mut stacks = CargoStacks::from(CARGO);
         let instructions = Instructions::from(INSTRUCTIONS);
-        CrateMove9000::move_crates(&mut stacks, &instructions);
+        CrateMover9000::move_crates(&mut stacks, &instructions);
 
         assert_eq!(
             *stacks,
             vec![vec!['C'], vec!['M'], vec!['P', 'D', 'N', 'Z']]
+        );
+    }
+
+    #[test]
+    fn cratemover9001_first_instruction() {
+        let mut stacks = CargoStacks(vec![vec!['Z', 'N'], vec!['M', 'C', 'D'], vec!['P']]);
+        let instructions = Instructions(vec![Instruction {
+            count: 1,
+            from: 2,
+            to: 1,
+        }]);
+
+        CrateMover9000::move_crates(&mut stacks, &instructions);
+
+        assert_eq!(
+            *stacks,
+            vec![vec!['Z', 'N', 'D'], vec!['M', 'C'], vec!['P']]
+        );
+    }
+
+    #[test]
+    fn cratemover9001_first_two_instructions() {
+        let mut stacks = CargoStacks(vec![vec!['Z', 'N'], vec!['M', 'C', 'D'], vec!['P']]);
+        let instructions = Instructions(vec![
+            Instruction {
+                count: 1,
+                from: 2,
+                to: 1,
+            },
+            Instruction {
+                count: 3,
+                from: 1,
+                to: 3,
+            },
+        ]);
+
+        CrateMover9001::move_crates(&mut stacks, &instructions);
+
+        assert_eq!(
+            *stacks,
+            vec![vec![], vec!['M', 'C'], vec!['P', 'Z', 'N', 'D']]
+        );
+    }
+
+    #[test]
+    fn cratemover9001_whole_sample() {
+        let mut stacks = CargoStacks::from(CARGO);
+        let instructions = Instructions::from(INSTRUCTIONS);
+        CrateMover9001::move_crates(&mut stacks, &instructions);
+
+        assert_eq!(
+            *stacks,
+            vec![vec!['M'], vec!['C'], vec!['P', 'Z', 'N', 'D']]
         );
     }
 }

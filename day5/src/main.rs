@@ -4,7 +4,7 @@ use day5::take1::*;
 fn main() {
     let input = day_inputs(5);
     println!("Part 1: {}", part1(&input));
-    // println!("Part 2: {}", part2(&input));
+    println!("Part 2: {}", part2(&input));
 }
 
 fn part1(input: &str) -> String {
@@ -12,12 +12,17 @@ fn part1(input: &str) -> String {
     let mut stacks = CargoStacks::from(stacks);
     let instructions = Instructions::from(instructions);
 
-    CrateMove9000::move_crates(&mut stacks, &instructions);
+    CrateMover9000::move_crates(&mut stacks, &instructions);
     stacks.tops()
 }
 
 fn part2(input: &str) -> String {
-    todo!()
+    let (stacks, instructions) = split_input(input);
+    let mut stacks = CargoStacks::from(stacks);
+    let instructions = Instructions::from(instructions);
+
+    CrateMover9001::move_crates(&mut stacks, &instructions);
+    stacks.tops()
 }
 
 // #[cfg(test)]
