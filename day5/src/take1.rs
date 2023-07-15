@@ -1,13 +1,26 @@
 use itertools::Itertools;
 use std::ops::{Deref, DerefMut};
 
-pub fn split_input(input: &str) -> (&str, &str) {
-    let mut split = input.split("\n\n");
-    (split.next().unwrap(), split.next().unwrap())
+pub fn part1(input: &str) -> String {
+    let (stacks, instructions) = crate::split_input(input);
+    let mut stacks = CargoStacks::from(stacks);
+    let instructions = Instructions::from(instructions);
+
+    CrateMover9000::move_crates(&mut stacks, &instructions);
+    stacks.tops()
+}
+
+pub fn part2(input: &str) -> String {
+    let (stacks, instructions) = crate::split_input(input);
+    let mut stacks = CargoStacks::from(stacks);
+    let instructions = Instructions::from(instructions);
+
+    CrateMover9001::move_crates(&mut stacks, &instructions);
+    stacks.tops()
 }
 
 #[derive(Debug, PartialEq)]
-pub struct CargoStacks(Vec<Vec<char>>);
+struct CargoStacks(Vec<Vec<char>>);
 
 impl CargoStacks {
     fn stack_count(value: &str) -> Option<usize> {
@@ -19,7 +32,7 @@ impl CargoStacks {
             .and_then(|num_str| num_str.parse::<usize>().ok())
     }
 
-    pub fn tops(&self) -> String {
+    fn tops(&self) -> String {
         let mut ret = String::with_capacity(self.0.len());
         for stack in self.0.iter() {
             if let Some(top) = stack.last() {
@@ -64,14 +77,14 @@ impl From<&str> for CargoStacks {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Instruction {
-    pub count: usize,
-    pub from: usize,
-    pub to: usize,
+struct Instruction {
+    count: usize,
+    from: usize,
+    to: usize,
 }
 
 #[derive(Debug)]
-pub struct Instructions(Vec<Instruction>);
+struct Instructions(Vec<Instruction>);
 
 impl From<&str> for Instructions {
     fn from(value: &str) -> Self {
@@ -101,11 +114,11 @@ impl Deref for Instructions {
     }
 }
 
-pub trait CrateMover {
+trait CrateMover {
     fn move_crates(cargo: &mut CargoStacks, instructions: &Instructions);
 }
 
-pub struct CrateMover9000;
+struct CrateMover9000;
 
 impl CrateMover for CrateMover9000 {
     fn move_crates(cargo: &mut CargoStacks, instructions: &Instructions) {
@@ -118,7 +131,7 @@ impl CrateMover for CrateMover9000 {
     }
 }
 
-pub struct CrateMover9001;
+struct CrateMover9001;
 
 impl CrateMover for CrateMover9001 {
     fn move_crates(cargo: &mut CargoStacks, instructions: &Instructions) {
@@ -158,13 +171,6 @@ move 2 from 2 to 1
 move 1 from 1 to 2";
 
     use super::*;
-
-    #[test]
-    fn test_split_input() {
-        let (stack, instructions) = split_input(INPUT);
-        assert_eq!(stack, CARGO);
-        assert_eq!(instructions, INSTRUCTIONS);
-    }
 
     #[test]
     fn stack_count() {
