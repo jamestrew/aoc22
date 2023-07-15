@@ -4,9 +4,11 @@ use itertools::Itertools;
 use nom::{
     branch::alt,
     bytes::complete::{tag, take},
-    combinator::{all_consuming, map, map_res, opt},
+    character::complete::digit1,
+    combinator::{all_consuming, map, map_res},
+    multi::separated_list1,
     sequence::{delimited, preceded, tuple},
-    Finish, IResult, character::complete::digit1,
+    Finish, IResult,
 };
 
 pub fn part1(input: &str) -> String {
@@ -46,19 +48,7 @@ fn parse_hole_or_crate(i: &str) -> IResult<&str, Option<Crate>> {
 }
 
 fn parse_crate_line(i: &str) -> IResult<&str, Vec<Option<Crate>>> {
-    let (mut i, c) = parse_hole_or_crate(i)?;
-    let mut v = vec![c];
-
-    loop {
-        let (next_i, maybe_c) = opt(preceded(tag(" "), parse_hole_or_crate))(i)?;
-        match maybe_c {
-            Some(c) => v.push(c),
-            None => break,
-        }
-        i = next_i;
-    }
-
-    Ok((i, v))
+    separated_list1(tag(" "), parse_hole_or_crate)(i)
 }
 
 pub fn parse_crate_lines(i: &str) -> Vec<Vec<Crate>> {
